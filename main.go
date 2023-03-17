@@ -4,11 +4,9 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"image/color"
 	"io"
 	"os"
 
-	pdf "github.com/stephenafamo/goldmark-pdf"
 	"github.com/yuin/goldmark"
 )
 
@@ -34,7 +32,6 @@ Flags:
 	headerFile := flag.String("head", "", "Path to header file")
 	footerFile := flag.String("foot", "", "Path to footer file")
 	outputFile := flag.String("o", "", "Path to output file")
-	outputType := flag.String("t", "html", "Output type: html or pdf")
 	flag.Parse()
 
 	if flag.NArg() > 1 {
@@ -67,25 +64,6 @@ Flags:
 	}
 
 	var output bytes.Buffer
-
-	if *outputType == "pdf" {
-		font := pdf.FontCourier
-		md := goldmark.New(
-			goldmark.WithRenderer(
-				pdf.New(
-					pdf.WithHeadingFont(font),
-					pdf.WithBodyFont(font),
-					pdf.WithCodeFont(font),
-					pdf.WithLinkColor(color.RGBA{0, 0, 255, 0}), // blue
-				),
-			),
-		)
-		if err := md.Convert(input.Bytes(), &output); err != nil {
-			return err
-		}
-		w.Write(output.Bytes())
-		return nil
-	}
 
 	if *headerFile != "" {
 		header, err := os.Open(*headerFile)
