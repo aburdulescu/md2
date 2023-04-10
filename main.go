@@ -8,6 +8,8 @@ import (
 	"os"
 
 	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/extension"
+	"github.com/yuin/goldmark/parser"
 )
 
 func main() {
@@ -19,7 +21,7 @@ func main() {
 
 func mainErr() error {
 	flag.Usage = func() {
-		fmt.Fprint(os.Stderr, `Usage: md2 [-head header.html] [-foot footer.html] [FILE.md]
+		fmt.Fprint(os.Stderr, `Usage: md2 [-h=header.html] [-f=footer.html] [-o=output] [FILE.md]
 
 Convert the given FILE.md(or read stdin if not specified) to HTML.
 Optionally, apply given header and footer to the generated HTML file.
@@ -29,8 +31,8 @@ Flags:
 		flag.PrintDefaults()
 	}
 
-	headerFile := flag.String("head", "", "Path to header file")
-	footerFile := flag.String("foot", "", "Path to footer file")
+	headerFile := flag.String("h", "", "Path to header file")
+	footerFile := flag.String("f", "", "Path to footer file")
 	outputFile := flag.String("o", "", "Path to output file")
 	flag.Parse()
 
@@ -74,7 +76,20 @@ Flags:
 		io.Copy(&output, header)
 	}
 
-	if err := goldmark.Convert(input.Bytes(), &output); err != nil {
+	md := goldmark.New(
+		goldmark.WithExtensions(
+			extension.GFM,
+			extension.DefinitionList,
+			extension.Footnote,
+		),
+		goldmark.WithParserOptions(
+			// useful for fragment links: href=#ID
+			parser.WithAutoHeadingID(),
+			parser.WithAttribute(),
+		),
+	)
+
+	if err := md.Convert(input.Bytes(), &output); err != nil {
 		return err
 	}
 
