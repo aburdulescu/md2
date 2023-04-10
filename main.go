@@ -11,7 +11,12 @@ import (
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
+
+	_ "embed"
 )
+
+//go:embed example.md
+var example string
 
 func main() {
 	if err := mainErr(); err != nil {
@@ -36,6 +41,7 @@ Flags:
 	footerFile := flag.String("f", "", "Path to footer file")
 	outputFile := flag.String("o", "", "Path to output file")
 	printVersion := flag.Bool("version", false, "Print version")
+	printExample := flag.Bool("example", false, "Print example")
 	flag.Parse()
 
 	if *printVersion {
@@ -49,6 +55,11 @@ Flags:
 			return ""
 		}
 		fmt.Println(bi.Main.Version, bi.GoVersion, g("GOOS"), g("GOARCH"), g("vcs.revision"), g("vcs.time"))
+		return nil
+	}
+
+	if *printExample {
+		fmt.Print(example)
 		return nil
 	}
 
