@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime/debug"
 
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
@@ -34,7 +35,22 @@ Flags:
 	headerFile := flag.String("h", "", "Path to header file")
 	footerFile := flag.String("f", "", "Path to footer file")
 	outputFile := flag.String("o", "", "Path to output file")
+	printVersion := flag.Bool("version", false, "Print version")
 	flag.Parse()
+
+	if *printVersion {
+		bi, _ := debug.ReadBuildInfo()
+		g := func(key string) string {
+			for _, v := range bi.Settings {
+				if v.Key == key {
+					return v.Value
+				}
+			}
+			return ""
+		}
+		fmt.Println(bi.Main.Version, bi.GoVersion, g("GOOS"), g("GOARCH"), g("vcs.revision"), g("vcs.time"))
+		return nil
+	}
 
 	if flag.NArg() > 1 {
 		return fmt.Errorf("cannot handle more than one input file")
