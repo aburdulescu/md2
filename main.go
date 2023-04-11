@@ -44,7 +44,8 @@ Flags:
 	printExample := flag.Bool("example", false, "Print example")
 	flag.Parse()
 
-	if *printVersion {
+	switch {
+	case *printVersion:
 		bi, _ := debug.ReadBuildInfo()
 		g := func(key string) string {
 			for _, v := range bi.Settings {
@@ -54,11 +55,14 @@ Flags:
 			}
 			return ""
 		}
-		fmt.Println(bi.Main.Version, bi.GoVersion, g("GOOS"), g("GOARCH"), g("vcs.revision"), g("vcs.time"))
+		fmt.Println(
+			bi.Main.Version, bi.GoVersion,
+			g("GOOS"), g("GOARCH"),
+			g("vcs.revision"), g("vcs.time"),
+		)
 		return nil
-	}
 
-	if *printExample {
+	case *printExample:
 		fmt.Print(example)
 		return nil
 	}
@@ -100,7 +104,9 @@ Flags:
 			return err
 		}
 		defer header.Close()
-		io.Copy(&output, header)
+		if _, err := io.Copy(&output, header); err != nil {
+			return err
+		}
 	}
 
 	md := goldmark.New(
@@ -126,10 +132,14 @@ Flags:
 			return err
 		}
 		defer footer.Close()
-		io.Copy(&output, footer)
+		if _, err := io.Copy(&output, footer); err != nil {
+			return err
+		}
 	}
 
-	io.Copy(w, &output)
+	if _, err := io.Copy(w, &output); err != nil {
+		return err
+	}
 
 	return nil
 }
