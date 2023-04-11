@@ -13,6 +13,7 @@ import (
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
+	"github.com/yuin/goldmark/renderer/html"
 
 	_ "embed"
 )
@@ -140,6 +141,9 @@ Flags:
 			// useful for fragment links: href=#ID
 			parser.WithAutoHeadingID(),
 			parser.WithAttribute(),
+		),
+		goldmark.WithRendererOptions(
+			html.WithUnsafe(),
 		),
 	)
 
