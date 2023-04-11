@@ -1,2 +1,5 @@
 # md2
-Convert Markdown(CommonMark) to HTML
+
+Convert Markdown to HTML.
+
+See ./example.md for the supported features.
