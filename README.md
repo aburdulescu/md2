@@ -2,4 +2,4 @@
 
 Convert Markdown to HTML.
 
-See ./example.md for the supported features.
+See [example](./example.md) for the supported features.

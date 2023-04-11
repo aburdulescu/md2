@@ -1,3 +1,10 @@
+These are all the Markdown features supported
+(CommonMark + Github extensions + some other extensions).
+
+Run this file through the tool to see the resulting HTML:
+
+`md2 example.md > example.html`
+
 # Heading
 
 # h1

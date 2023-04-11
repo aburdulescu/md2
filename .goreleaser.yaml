@@ -15,11 +15,15 @@ builds:
       - goos: windows
         goarch: arm64
 archives:
-  -
-    wrap_in_directory: true
+  - wrap_in_directory: true
+    rlcp: true
     format_overrides:
       - goos: windows
         format: zip
+    files:
+      - LICENSE
+      - README.md
+      - example.md
 checksum:
   name_template: 'checksums.txt'
 snapshot:
