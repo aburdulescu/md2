@@ -5,8 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"runtime/debug"
+	"time"
 
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
@@ -42,6 +44,8 @@ Flags:
 	outputFile := flag.String("o", "", "Path to output file")
 	printVersion := flag.Bool("version", false, "Print version")
 	printExample := flag.Bool("example", false, "Print example")
+	serveFiles := flag.Bool("serve", false, "Serve files")
+	serveAddr := flag.String("serve-addr", "localhost:12345", "Serve address")
 	flag.Parse()
 
 	switch {
@@ -65,6 +69,23 @@ Flags:
 	case *printExample:
 		fmt.Print(example)
 		return nil
+
+	case *serveFiles:
+		dir := "."
+		if flag.NArg() != 0 {
+			dir = flag.Arg(0)
+		}
+		fileServer := http.FileServer(http.Dir(dir))
+		http.Handle("/", fileServer)
+		s := &http.Server{
+			Addr:           *serveAddr,
+			Handler:        nil,
+			ReadTimeout:    10 * time.Second,
+			WriteTimeout:   10 * time.Second,
+			MaxHeaderBytes: 1 << 20,
+		}
+		fmt.Printf("serving files from %s on %s\n", dir, *serveAddr)
+		return s.ListenAndServe()
 	}
 
 	if flag.NArg() > 1 {
